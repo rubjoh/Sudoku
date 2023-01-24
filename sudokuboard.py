@@ -3,55 +3,59 @@ from sudoku_reader import Sudoku_reader
 from square import Square
 from element import Element
 import numpy as np
+import time
+
+start = time.time()
 
 class SudokuBoard(Board):
 
     def __init__(self, nums):
         super().__init__(nums)
 
-        #Initialize the board and set up ref
-        self.board = self._set_up_nums()
-        self._set_up_elems()
-
         #Storing the rows, colums and boxes:
         self.rows = []
         self.cols = []
         self.boxes = []
-        
+
+        #Initialize the board and set up the elements
+        self.board = self._set_up_nums()
+        self._set_up_elems()
 
     
     def _set_up_nums(self):
         #Set up the board using square objects 
         board = np.asarray([[Square(value) for value in row] for row in self.nums])
-        return board
+        return board        
+
+
+    def _boxes(self):
+        #Generator method that returns one box at a time
+        for i in range(0,9,3):
+            for j in range(0,9,3):
+                box = [self.board[x][y] for x in range(i,i+3) for y in range(j,j+3)]
+                yield box
+
 
     def _set_up_elems(self):
-        #Set up links between squares and elements
-        #board = self._set_up_nums()
+        #Set up the elements of the board
 
-        #Rows:
-        for row in range(9):
-            row_elements = Element(self.board[row], type="row")
-            self.rows.append(row_elements)
-        
-        #Column:
-        for col in range(9):
-            col_elements = Element(self.board[:,col], type="col")
-            self.cols.append(col_elements)
+        #set up rows
+        for i, row in enumerate(self.board):
+            self.rows.append(Element(row, "row", i))
 
-        #Box:
-        for i in range(3):
-            for j in range(3):
-                for row in range(i*3, i*3+3):
-                    for col in range(j*3, j*3+3):
-                        box_squares = [self.board[i][j] for i in range(row-row//3, row-row//3+3) for j in range(col-col//3, col-col//3+3)]
-                        box_elements = Element(box_squares, type="box")
-                        self.boxes.append(box_elements)
-        
-            
+        #set up columns
+        for i, col in enumerate(zip(*self.board)):
+            self.cols.append(Element(col, "col", i))
+
+        #set up boxes
+        for i, box in enumerate(self._boxes()):
+            self.boxes.append(Element(box, "box", i))
+
 
 
     def find_empty(self, board):
+        #Finds the empty squares on the board
+        #Returns the coordinates or None if all values != 0
         for row in range(9):
             for col in range(9):
                 if board[row][col].value == 0:
@@ -60,35 +64,42 @@ class SudokuBoard(Board):
 
 
     def solve(self):
-
+        #Find the empty squares
         empty = self.find_empty(self.board)
+        #If no empty squares, then the sudoku is solved
         if not empty:
-            for row in range(9):
-                for col in range(9):
-                    print(self.board[row][col].value)
-            #print(self.board)
-            self._set_up_elems()
             return True
-
+        #Using the coordinates for the empty square to test value and set value
         row, col = empty
         for number in range(1, 10):
-            if self.board[row][col].is_legal(number, self.board):
-                self.board[row][col].set_value(number, row, col)
+            if self.board[row][col].is_legal(number, self.rows, self.cols, self.boxes):
+                self.board[row][col].set_value(number)
+                #Update the elements when the new value has been set
                 self._set_up_elems()
+                #Recursion
                 if self.solve():
                     return True
                 else:
-                    self.board[row][col].set_value(0, row, col)
+                    #Backtracking
+                    self.board[row][col].set_value(0)
         return False
 
+
+    def print_board(self):
+        for row in self.board:
+            for square in row:
+                print(square.value, end=' ')
+            print()
 
 
 if __name__ == "__main__":
     reader = Sudoku_reader("sudoku_10.csv")
-    b = SudokuBoard(reader.next_board())
-    solved_board = b.solve()
-    print(solved_board)
+    unsolved_board = SudokuBoard(reader.next_board())
+    solved_board = unsolved_board.solve()
+    unsolved_board.print_board()
 
+    end = time.time()
+    print(f'Execution Time:{end-start}')
  
 
 

@@ -2,17 +2,18 @@ from square import Square
 
 class Element:
 
-    def __init__(self, squares, type):
+    def __init__(self, squares, type, id):
         self.squares = squares
+        self.id = id
 
 
         for square in self.squares:
             if type == "row":
-                square.row = self
+                square.row = self.id
             if type == "col":
-                square.col = self
+                square.col = self.id
             if type == "box": 
-                square.box = self
+                square.box = self.id
 
     def has_value(self, value):
         """
@@ -24,5 +25,5 @@ class Element:
         for square in self.squares:
             if square.value == value:
                 return True
-            
+
         return False 
