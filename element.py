@@ -14,16 +14,15 @@ class Element:
             if type == "box": 
                 square.box = self
 
-    
     def has_value(self, value):
         """
         Method to check if a given number is a part of the element.
         Args: self and the value you want to check
         Output: True if value is in element and false if not. 
         """
-        
+            
         for square in self.squares:
             if square.value == value:
                 return True
-        
+            
         return False 
