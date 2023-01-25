@@ -21,14 +21,16 @@ class SudokuBoard(Board):
         self.board = self._set_up_nums()
         self._set_up_elems()
 
+        
+
     
     def _set_up_nums(self):
         #Set up the board using square objects 
-        board = np.asarray([[Square(value) for value in row] for row in self.nums])
-        return board        
+        return np.asarray([[Square(value) for value in row] for row in self.nums])
+       
 
 
-    def _boxes(self):
+    def _box(self):
         #Generator method that returns one box at a time
         for i in range(0,9,3):
             for j in range(0,9,3):
@@ -38,18 +40,19 @@ class SudokuBoard(Board):
 
     def _set_up_elems(self):
         #Set up the elements of the board
+        #Storing these elements in self.rows, self.cols and self.boxes
 
-        #set up rows
-        for i, row in enumerate(self.board):
-            self.rows.append(Element(row, "row", i))
+        #Set up rows
+        for id, row in enumerate(self.board):
+            self.rows.append(Element(row, "row", id))
 
-        #set up columns
-        for i, col in enumerate(zip(*self.board)):
-            self.cols.append(Element(col, "col", i))
+        #Set up columns
+        for id, col in enumerate(zip(*self.board)):
+            self.cols.append(Element(col, "col", id))
 
-        #set up boxes
-        for i, box in enumerate(self._boxes()):
-            self.boxes.append(Element(box, "box", i))
+        #Set up boxes
+        for id, box in enumerate(self._box()):
+            self.boxes.append(Element(box, "box", id))
 
 
 
@@ -85,19 +88,32 @@ class SudokuBoard(Board):
         return False
 
 
-    def print_board(self):
-        for row in self.board:
-            for square in row:
-                print(square.value, end=' ')
-            print()
+    def print_board(self, spaceing):
+        #Method for printing the solved board 
+        print()
+        for row in range(9):
+            if row != 0 and row % 3 == 0:
+                if spaceing == "":
+                    print("- - - - - - - - - - -")
+                if spaceing == " ":
+                    print("- - - - - - - - - - - - - - -") 
+                if spaceing == "  ":
+                    print("- - - - - - - - - - - - - - - - - - -")
+            for col in range(9):
+                if col != 0 and col % 3 == 0:
+                    print("|", end=" ")
 
+                if col == 8:
+                    print(self.board[row][col].value)
+                else:
+                    print(str(self.board[row][col].value)+ spaceing, end=" ")
+        print()
 
 if __name__ == "__main__":
     reader = Sudoku_reader("sudoku_10.csv")
-    unsolved_board = SudokuBoard(reader.next_board())
-    solved_board = unsolved_board.solve()
-    unsolved_board.print_board()
-
+    board = SudokuBoard(reader.next_board())
+    board.solve()
+    board.print_board(spaceing=" ")
     end = time.time()
     print(f'Execution Time:{end-start}')
  
