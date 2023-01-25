@@ -47,7 +47,7 @@ class SudokuBoard(Board):
             self.rows.append(Element(row, "row", id))
 
         #Set up columns
-        for id, col in enumerate(zip(*self.board)):
+        for id, col in enumerate(np.transpose(self.board)):
             self.cols.append(Element(col, "col", id))
 
         #Set up boxes
@@ -109,14 +109,20 @@ class SudokuBoard(Board):
                     print(str(self.board[row][col].value)+ spaceing, end=" ")
         print()
 
-if __name__ == "__main__":
-    reader = Sudoku_reader("sudoku_10.csv")
-    board = SudokuBoard(reader.next_board())
-    board.solve()
-    board.print_board(spaceing=" ")
+
+def solve_boards(filename, num_of_boards):
+    reader = Sudoku_reader(filename)
+    for i in range(num_of_boards):
+        print(f"Solution for board: {i + 1}")
+        board = SudokuBoard(reader.next_board())
+        board.solve()
+        board.print_board(spaceing=" ")
     end = time.time()
-    print(f'Execution Time:{end-start}')
- 
+    print(f"Execution Time:%.2fs"%(end-start))
+
+if __name__ == "__main__":
+    solve_boards("sudoku_10.csv", 10)
+
 
 
 

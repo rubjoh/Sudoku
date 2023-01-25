@@ -36,12 +36,4 @@ class Board:
         return r
 
 if __name__ == "__main__":
-    # Test code...
-    reader = Sudoku_reader("sudoku_10.csv")
-    board = Board(reader.next_board())
-    print(board)
-
-
-
-
-
+    pass
