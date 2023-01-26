@@ -77,8 +77,6 @@ class SudokuBoard(Board):
         for number in range(1, 10):
             if self.board[row][col].is_legal(number, self.rows, self.cols, self.boxes):
                 self.board[row][col].set_value(number)
-                #Update the elements when the new value has been set
-                self._set_up_elems()
                 #Recursion
                 if self.solve():
                     return True
